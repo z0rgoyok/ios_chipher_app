@@ -122,23 +122,36 @@ class MediaRepositoryImpl implements MediaRepository {
     bool removeOriginal = true,
   }) async {
     try {
+      AppLogger.i('Начинаем импорт и шифрование файла: $filePath');
+
       // Проверяем существование файла
+      AppLogger.i('Проверяем существование файла');
       final fileExistsResult = await _fileSystemRepository.fileExists(filePath);
       if (fileExistsResult.isFailure) {
+        AppLogger.e(
+          'Ошибка при проверке существования файла: ${fileExistsResult.failure.message}',
+        );
         return Result.failure(fileExistsResult.failure);
       }
 
       if (!fileExistsResult.value) {
+        AppLogger.e('Исходный файл не существует: $filePath');
         return Result.failure(
           FileSystemFailure(message: 'Исходный файл не существует: $filePath'),
         );
       }
 
+      AppLogger.i('Файл существует');
+
       // Получаем метаданные файла
+      AppLogger.i('Получаем метаданные файла');
       final metadataResult = await _galleryRepository.getMediaMetadata(
         filePath,
       );
       if (metadataResult.isFailure) {
+        AppLogger.e(
+          'Ошибка при получении метаданных файла: ${metadataResult.failure.message}',
+        );
         return Result.failure(metadataResult.failure);
       }
 
@@ -147,33 +160,64 @@ class MediaRepositoryImpl implements MediaRepository {
       final fileType = metadata['type'] as String;
       final fileName = metadata['name'] as String;
 
+      AppLogger.i(
+        'Метаданные файла: тип=$fileType, имя=$fileName, расширение=$extension',
+      );
+
       // Генерируем путь для зашифрованного файла
+      AppLogger.i('Генерируем путь для зашифрованного файла');
       final encryptedPathResult = await _fileSystemRepository
           .generateEncryptedFilePath(extension);
       if (encryptedPathResult.isFailure) {
+        AppLogger.e(
+          'Ошибка при генерации пути для зашифрованного файла: ${encryptedPathResult.failure.message}',
+        );
         return Result.failure(encryptedPathResult.failure);
       }
 
       final encryptedPath = encryptedPathResult.value;
+      AppLogger.i('Сгенерирован путь для зашифрованного файла: $encryptedPath');
 
       // Шифруем файл
+      AppLogger.i('Начинаем шифрование файла');
       final encryptResult = await _cryptoRepository.encryptFile(
         filePath,
         encryptedPath,
       );
       if (encryptResult.isFailure) {
+        AppLogger.e(
+          'Ошибка при шифровании файла: ${encryptResult.failure.message}',
+        );
         return Result.failure(encryptResult.failure);
       }
 
+      AppLogger.i('Файл успешно зашифрован');
+
       // Если файл был успешно зашифрован, удаляем оригинал если требуется
       if (removeOriginal) {
-        await _galleryRepository.deleteFromGallery(filePath);
+        AppLogger.i('Удаляем оригинальный файл');
+        final deleteResult = await _galleryRepository.deleteFromGallery(
+          filePath,
+        );
+
+        if (deleteResult.isFailure) {
+          AppLogger.w(
+            'Не удалось удалить оригинальный файл: ${deleteResult.failure.message}',
+          );
+        } else if (deleteResult.value) {
+          AppLogger.i('Оригинальный файл успешно удален');
+        } else {
+          AppLogger.w('Оригинальный файл не был удален');
+        }
       }
 
       // Генерируем миниатюру для медиафайла (реализация создания миниатюры в реальном приложении)
+      AppLogger.i('Генерируем миниатюру для медиафайла');
       final thumbnailPath = await _generateThumbnail(encryptedPath, fileType);
+      AppLogger.i('Миниатюра создана: $thumbnailPath');
 
       // Создаем запись о медиафайле
+      AppLogger.i('Создаем запись о медиафайле в БД');
       final now = DateTime.now();
       final mediaFile = MediaFileModel(
         id: _uuid.v4(),
@@ -188,15 +232,31 @@ class MediaRepositoryImpl implements MediaRepository {
       );
 
       // Сохраняем в базу данных
-      final db = await _initDatabase();
-      await db.insert(_tableName, mediaFile.toJson());
+      try {
+        AppLogger.i('Инициализируем базу данных');
+        final db = await _initDatabase();
+        AppLogger.i('Добавляем запись в базу данных');
+        await db.insert(_tableName, mediaFile.toJson());
+        AppLogger.i('Запись успешно добавлена в базу данных');
+      } catch (dbError, dbStack) {
+        AppLogger.e('Ошибка при сохранении в базу данных', dbError, dbStack);
+        return Result.failure(
+          DatabaseFailure(
+            message:
+                'Не удалось сохранить данные о медиафайле: ${dbError.toString()}',
+            stackTrace: dbStack,
+          ),
+        );
+      }
 
+      AppLogger.i('Импорт и шифрование файла успешно завершены');
       return Result.success(mediaFile);
     } catch (e, stack) {
       AppLogger.e('Ошибка при импорте и шифровании файла', e, stack);
       return Result.failure(
         MediaGalleryFailure(
-          message: 'Не удалось импортировать и зашифровать файл',
+          message:
+              'Не удалось импортировать и зашифровать файл: ${e.toString()}',
           stackTrace: stack,
         ),
       );
