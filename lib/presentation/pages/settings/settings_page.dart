@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Страница настроек приложения
 class SettingsPage extends HookConsumerWidget {
@@ -8,24 +9,25 @@ class SettingsPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // В реальном приложении здесь будут использоваться провайдеры состояния
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Настройки')),
+      appBar: AppBar(title: Text(l10n.settings)),
       body: ListView(
         children: [
-          const _SettingsSectionHeader(title: 'Безопасность'),
+          _SettingsSectionHeader(title: l10n.securitySection),
 
           // Переключатель биометрии
           SwitchListTile(
-            title: const Text('Биометрическая аутентификация'),
-            subtitle: const Text('Использовать отпечаток пальца или Face ID'),
+            title: Text(l10n.biometricAuth),
+            subtitle: Text(l10n.biometricAuthDesc),
             value: true, // В реальном приложении будет из провайдера
             onChanged: (value) {
               // В реальном приложении будет использоваться соответствующий use case
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    value ? 'Биометрия включена' : 'Биометрия отключена',
+                    value ? l10n.biometricEnabled : l10n.biometricDisabled,
                   ),
                   duration: const Duration(seconds: 2),
                 ),
@@ -35,33 +37,33 @@ class SettingsPage extends HookConsumerWidget {
 
           // Смена пароля
           ListTile(
-            title: const Text('Изменить пароль'),
+            title: Text(l10n.changePassword),
             leading: const Icon(Icons.lock_outline),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               // В реальном приложении будет открываться диалог смены пароля
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Функция будет реализована позже'),
-                  duration: Duration(seconds: 2),
+                SnackBar(
+                  content: Text(l10n.functionNotImplemented),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
           ),
 
           const Divider(),
-          const _SettingsSectionHeader(title: 'Приложение'),
+          _SettingsSectionHeader(title: l10n.appSection),
 
           // Переключатель темы
           SwitchListTile(
-            title: const Text('Темная тема'),
+            title: Text(l10n.darkTheme),
             value: Theme.of(context).brightness == Brightness.dark,
             onChanged: (value) {
               // В реальном приложении будет переключение темы
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    value ? 'Темная тема включена' : 'Светлая тема включена',
+                    value ? l10n.darkThemeEnabled : l10n.lightThemeEnabled,
                   ),
                   duration: const Duration(seconds: 2),
                 ),
@@ -71,41 +73,41 @@ class SettingsPage extends HookConsumerWidget {
 
           // Очистка кэша
           ListTile(
-            title: const Text('Очистить кэш'),
-            subtitle: const Text('Удалить временные файлы'),
+            title: Text(l10n.clearCache),
+            subtitle: Text(l10n.clearCacheDesc),
             leading: const Icon(Icons.cleaning_services_outlined),
             onTap: () {
               // В реальном приложении будет очистка кэша
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Кэш очищен'),
-                  duration: Duration(seconds: 2),
+                SnackBar(
+                  content: Text(l10n.cacheCleared),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
           ),
 
           const Divider(),
-          const _SettingsSectionHeader(title: 'Информация'),
+          _SettingsSectionHeader(title: l10n.infoSection),
 
           // Версия приложения
           ListTile(
-            title: const Text('Версия приложения'),
+            title: Text(l10n.appVersion),
             subtitle: const Text('1.0.0'),
             leading: const Icon(Icons.info_outline),
           ),
 
           // Политика конфиденциальности
           ListTile(
-            title: const Text('Политика конфиденциальности'),
+            title: Text(l10n.privacyPolicy),
             leading: const Icon(Icons.privacy_tip_outlined),
             trailing: const Icon(Icons.open_in_new),
             onTap: () {
               // В реальном приложении будет открываться политика
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Функция будет реализована позже'),
-                  duration: Duration(seconds: 2),
+                SnackBar(
+                  content: Text(l10n.functionNotImplemented),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
@@ -122,7 +124,7 @@ class SettingsPage extends HookConsumerWidget {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
               icon: const Icon(Icons.logout),
-              label: const Text('Выйти из приложения'),
+              label: Text(l10n.logout),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,

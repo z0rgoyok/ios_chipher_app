@@ -6,6 +6,7 @@ import 'package:ios_chipher_app/core/constants/app_constants.dart';
 import 'package:ios_chipher_app/presentation/pages/auth/login_page.dart';
 import 'package:ios_chipher_app/presentation/pages/home/home_page.dart';
 import 'package:ios_chipher_app/core/theme/app_theme.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Главный виджет приложения
 class SecureMediaVaultApp extends HookConsumerWidget {
@@ -25,11 +26,15 @@ class SecureMediaVaultApp extends HookConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('ru'), Locale('en')],
+      supportedLocales: const [
+        Locale('ru'), // Русский (основной)
+        Locale('en'), // Английский
+      ],
       debugShowCheckedModeBanner: false,
       home:
           isAuthenticated.value

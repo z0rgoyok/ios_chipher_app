@@ -2,29 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ios_chipher_app/core/theme/app_theme.dart';
+import 'package:ios_chipher_app/presentation/pages/home/home_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Страница входа в приложение
 class LoginPage extends HookConsumerWidget {
-  final VoidCallback onLoginSuccess;
-
-  const LoginPage({super.key, required this.onLoginSuccess});
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // В реальном приложении здесь будут использоваться провайдеры состояния
     final passwordController = useTextEditingController();
     final isPasswordVisible = useState(false);
     final isLoading = useState(false);
+    final l10n = AppLocalizations.of(context)!;
 
-    // Временная заглушка для авторизации - в реальном приложении
-    // здесь будет использоваться LoginUseCase
-    void handleLogin() {
+    // Обработчик входа
+    Future<void> handleLogin() async {
+      if (passwordController.text.isEmpty) {
+        return;
+      }
+
       isLoading.value = true;
 
-      // Имитация загрузки
-      Future.delayed(const Duration(seconds: 1), () {
-        isLoading.value = false;
-        onLoginSuccess();
-      });
+      // Имитация задержки для демонстрации
+      await Future.delayed(const Duration(seconds: 1));
+
+      isLoading.value = false;
+
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      }
     }
 
     return Scaffold(
@@ -44,13 +55,13 @@ class LoginPage extends HookConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Secure Media Vault',
+                  l10n.appName,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Защитите ваши фото и видео',
+                  l10n.appTagline,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
@@ -60,8 +71,8 @@ class LoginPage extends HookConsumerWidget {
                 TextField(
                   controller: passwordController,
                   decoration: InputDecoration(
-                    labelText: 'Пароль',
-                    hintText: 'Введите ваш пароль',
+                    labelText: l10n.password,
+                    hintText: l10n.passwordHint,
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -96,15 +107,14 @@ class LoginPage extends HookConsumerWidget {
                                 color: Colors.white,
                               ),
                             )
-                            : const Text(
-                              'Войти',
-                              style: TextStyle(fontSize: 16),
+                            : Text(
+                              l10n.login,
+                              style: const TextStyle(fontSize: 16),
                             ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Кнопка биометрии - в реальном приложении
                 OutlinedButton.icon(
                   onPressed:
                       isLoading.value
@@ -114,7 +124,7 @@ class LoginPage extends HookConsumerWidget {
                             handleLogin();
                           },
                   icon: const Icon(Icons.fingerprint),
-                  label: const Text('Вход по биометрии'),
+                  label: Text(l10n.biometricLogin),
                 ),
               ],
             ),

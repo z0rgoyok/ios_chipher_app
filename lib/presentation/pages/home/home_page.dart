@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:ios_chipher_app/core/utils/logger.dart';
-import 'package:ios_chipher_app/features/media/domain/entities/media_file.dart';
+import 'package:ios_chipher_app/core/logger/app_logger.dart';
+import 'package:ios_chipher_app/core/models/media_file.dart';
 import 'package:ios_chipher_app/presentation/pages/home/home_notifier.dart';
 import 'package:ios_chipher_app/presentation/pages/home/media_import_dialog.dart';
 import 'package:ios_chipher_app/presentation/pages/media/media_view_page.dart';
 import 'package:ios_chipher_app/presentation/pages/settings/settings_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Главная страница приложения
 class HomePage extends HookConsumerWidget {
@@ -14,6 +15,7 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final mediaState = ref.watch(homeNotifierProvider);
 
     // Используем useEffect для загрузки данных только при первом построении
@@ -73,7 +75,7 @@ class HomePage extends HookConsumerWidget {
 
       // Показываем сообщение о результате
       if (context.mounted) {
-        String errorMsg = mediaState.error ?? 'Неизвестная ошибка импорта';
+        String errorMsg = mediaState.error ?? l10n.unknownImportError;
         AppLogger.w('Сообщение об ошибке: $errorMsg');
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,12 +93,12 @@ class HomePage extends HookConsumerWidget {
                           context: context,
                           builder:
                               (context) => AlertDialog(
-                                title: const Text('Детали ошибки'),
+                                title: Text(l10n.errorDetails),
                                 content: Text(errorMsg),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),
-                                    child: const Text('OK'),
+                                    child: Text(l10n.ok),
                                   ),
                                 ],
                               ),
@@ -157,10 +159,23 @@ class HomePage extends HookConsumerWidget {
 
     // Показываем сообщение, если нет медиафайлов
     if (state.mediaFiles.isEmpty) {
-      return const Center(
-        child: Text(
-          'Нет файлов. Нажмите "+" чтобы добавить файлы',
-          textAlign: TextAlign.center,
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.photo_library_outlined,
+              size: 80,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+            const Text('Нет защищенных файлов', style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 8),
+            const Text(
+              'Нажмите + чтобы добавить фото или видео',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
         ),
       );
     }
@@ -190,24 +205,29 @@ class HomePage extends HookConsumerWidget {
                 Icon(
                   item.isImage ? Icons.image : Icons.video_file,
                   size: 40,
-                  color: Colors.grey[600],
+                  color: Colors.grey[700],
                 ),
 
                 // Индикатор типа файла
                 if (!item.isImage)
                   Positioned(
-                    bottom: 4,
-                    right: 4,
+                    bottom: 8,
+                    right: 8,
                     child: Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                        size: 16,
+                      child: Text(
+                        item.duration,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ),
