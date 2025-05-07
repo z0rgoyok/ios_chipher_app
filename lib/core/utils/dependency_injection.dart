@@ -1,7 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ios_chipher_app/core/utils/logger.dart';
+import 'package:ios_chipher_app/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:ios_chipher_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:ios_chipher_app/features/auth/domain/usecases/login_usecase.dart';
+import 'package:ios_chipher_app/features/media/data/repositories/crypto_repository_impl.dart';
+import 'package:ios_chipher_app/features/media/data/repositories/file_system_repository_impl.dart';
+import 'package:ios_chipher_app/features/media/data/repositories/gallery_repository_impl.dart';
+import 'package:ios_chipher_app/features/media/data/repositories/media_repository_impl.dart';
 import 'package:ios_chipher_app/features/media/domain/repositories/crypto_repository.dart';
 import 'package:ios_chipher_app/features/media/domain/repositories/file_system_repository.dart';
 import 'package:ios_chipher_app/features/media/domain/repositories/gallery_repository.dart';
@@ -15,32 +20,40 @@ import 'package:ios_chipher_app/features/media/domain/usecases/view_media_usecas
 class DI {
   DI._();
 
-  // Репозитории (в реальном приложении здесь будут созданы реальные реализации)
+  // Репозитории (реальные реализации)
   static final authRepositoryProvider = Provider<AuthRepository>((ref) {
     AppLogger.i('Инициализация AuthRepository');
-    throw UnimplementedError('AuthRepository еще не реализован');
-  });
-
-  static final mediaRepositoryProvider = Provider<MediaRepository>((ref) {
-    AppLogger.i('Инициализация MediaRepository');
-    throw UnimplementedError('MediaRepository еще не реализован');
+    return AuthRepositoryImpl();
   });
 
   static final cryptoRepositoryProvider = Provider<CryptoRepository>((ref) {
     AppLogger.i('Инициализация CryptoRepository');
-    throw UnimplementedError('CryptoRepository еще не реализован');
+    return CryptoRepositoryImpl();
   });
 
   static final fileSystemRepositoryProvider = Provider<FileSystemRepository>((
     ref,
   ) {
     AppLogger.i('Инициализация FileSystemRepository');
-    throw UnimplementedError('FileSystemRepository еще не реализован');
+    return FileSystemRepositoryImpl();
   });
 
   static final galleryRepositoryProvider = Provider<GalleryRepository>((ref) {
     AppLogger.i('Инициализация GalleryRepository');
-    throw UnimplementedError('GalleryRepository еще не реализован');
+    return GalleryRepositoryImpl();
+  });
+
+  static final mediaRepositoryProvider = Provider<MediaRepository>((ref) {
+    AppLogger.i('Инициализация MediaRepository');
+    final cryptoRepository = ref.watch(cryptoRepositoryProvider);
+    final fileSystemRepository = ref.watch(fileSystemRepositoryProvider);
+    final galleryRepository = ref.watch(galleryRepositoryProvider);
+
+    return MediaRepositoryImpl(
+      cryptoRepository: cryptoRepository,
+      fileSystemRepository: fileSystemRepository,
+      galleryRepository: galleryRepository,
+    );
   });
 
   // Use cases

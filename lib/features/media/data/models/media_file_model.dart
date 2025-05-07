@@ -5,42 +5,31 @@ part 'media_file_model.g.dart';
 
 /// Модель для работы с медиафайлами в data-слое
 @JsonSerializable()
-class MediaFileModel {
-  final String id;
-  final String originalName;
-  @JsonKey(unknownEnumValue: MediaType.unknown)
-  final MediaType mediaType;
-  final String encryptedPath;
-  final int size;
-  final DateTime createdAt;
-  final DateTime encryptedAt;
-  final String? thumbnailId;
-  final Map<String, dynamic> metadata;
-
-  MediaFileModel({
-    required this.id,
-    required this.originalName,
-    required this.mediaType,
-    required this.encryptedPath,
-    required this.size,
-    required this.createdAt,
-    required this.encryptedAt,
-    this.thumbnailId,
-    this.metadata = const {},
+class MediaFileModel extends MediaFile {
+  const MediaFileModel({
+    required super.id,
+    required super.name,
+    required super.path,
+    required super.size,
+    required super.type,
+    required super.createdAt,
+    required super.updatedAt,
+    super.thumbnailPath,
+    super.originalPath,
   });
 
   /// Создает модель из доменной сущности
   factory MediaFileModel.fromEntity(MediaFile entity) {
     return MediaFileModel(
       id: entity.id,
-      originalName: entity.originalName,
-      mediaType: entity.mediaType,
-      encryptedPath: entity.encryptedPath,
+      name: entity.name,
+      path: entity.path,
       size: entity.size,
+      type: entity.type,
       createdAt: entity.createdAt,
-      encryptedAt: entity.encryptedAt,
-      thumbnailId: entity.thumbnailId,
-      metadata: entity.metadata,
+      updatedAt: entity.updatedAt,
+      thumbnailPath: entity.thumbnailPath,
+      originalPath: entity.originalPath,
     );
   }
 
@@ -48,14 +37,14 @@ class MediaFileModel {
   MediaFile toEntity() {
     return MediaFile(
       id: id,
-      originalName: originalName,
-      mediaType: mediaType,
-      encryptedPath: encryptedPath,
+      name: name,
+      path: path,
       size: size,
+      type: type,
       createdAt: createdAt,
-      encryptedAt: encryptedAt,
-      thumbnailId: thumbnailId,
-      metadata: metadata,
+      updatedAt: updatedAt,
+      thumbnailPath: thumbnailPath,
+      originalPath: originalPath,
     );
   }
 
@@ -69,25 +58,25 @@ class MediaFileModel {
   /// Создает копию модели с новыми значениями
   MediaFileModel copyWith({
     String? id,
-    String? originalName,
-    MediaType? mediaType,
-    String? encryptedPath,
+    String? name,
+    String? path,
     int? size,
+    String? type,
+    String? thumbnailPath,
+    String? originalPath,
     DateTime? createdAt,
-    DateTime? encryptedAt,
-    String? thumbnailId,
-    Map<String, dynamic>? metadata,
+    DateTime? updatedAt,
   }) {
     return MediaFileModel(
       id: id ?? this.id,
-      originalName: originalName ?? this.originalName,
-      mediaType: mediaType ?? this.mediaType,
-      encryptedPath: encryptedPath ?? this.encryptedPath,
+      name: name ?? this.name,
+      path: path ?? this.path,
       size: size ?? this.size,
+      type: type ?? this.type,
       createdAt: createdAt ?? this.createdAt,
-      encryptedAt: encryptedAt ?? this.encryptedAt,
-      thumbnailId: thumbnailId ?? this.thumbnailId,
-      metadata: metadata ?? this.metadata,
+      updatedAt: updatedAt ?? this.updatedAt,
+      thumbnailPath: thumbnailPath ?? this.thumbnailPath,
+      originalPath: originalPath ?? this.originalPath,
     );
   }
 }

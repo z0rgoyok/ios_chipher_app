@@ -1,6 +1,7 @@
 import 'package:ios_chipher_app/core/errors/failures.dart';
 import 'package:ios_chipher_app/core/utils/result.dart';
 import 'package:ios_chipher_app/features/media/domain/entities/media_file.dart';
+import 'package:ios_chipher_app/features/media/domain/entities/media_type.dart';
 import 'package:ios_chipher_app/features/media/domain/repositories/gallery_repository.dart';
 import 'package:ios_chipher_app/features/media/domain/repositories/media_repository.dart';
 
