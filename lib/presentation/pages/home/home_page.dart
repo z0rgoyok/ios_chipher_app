@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:ios_chipher_app/core/logger/app_logger.dart';
-import 'package:ios_chipher_app/core/models/media_file.dart';
+import 'package:ios_chipher_app/core/utils/logger.dart';
+import 'package:ios_chipher_app/features/media/domain/entities/media_file.dart';
 import 'package:ios_chipher_app/presentation/pages/home/home_notifier.dart';
 import 'package:ios_chipher_app/presentation/pages/home/media_import_dialog.dart';
 import 'package:ios_chipher_app/presentation/pages/media/media_view_page.dart';
@@ -44,9 +44,9 @@ class HomePage extends HookConsumerWidget {
       // Показываем индикатор загрузки
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Импорт медиафайла...'),
-            duration: Duration(seconds: 1),
+          SnackBar(
+            content: Text(l10n.importingMedia),
+            duration: const Duration(seconds: 1),
           ),
         );
       }
@@ -56,20 +56,20 @@ class HomePage extends HookConsumerWidget {
 
         if (mediaType == 'photo') {
           success = await ref.read(homeNotifierProvider.notifier).importImage();
-          message = 'Фото успешно импортировано и зашифровано';
+          message = l10n.photoImportSuccess;
           AppLogger.i('Результат импорта фото: $success');
         } else if (mediaType == 'video') {
           success = await ref.read(homeNotifierProvider.notifier).importVideo();
-          message = 'Видео успешно импортировано и зашифровано';
+          message = l10n.videoImportSuccess;
           AppLogger.i('Результат импорта видео: $success');
         } else {
           success = await ref.read(homeNotifierProvider.notifier).importMedia();
-          message = 'Медиафайл успешно импортирован и зашифрован';
+          message = l10n.mediaImportSuccess;
           AppLogger.i('Результат импорта медиа: $success');
         }
       } catch (e, stackTrace) {
         success = false;
-        message = 'Ошибка при импорте: ${e.toString()}';
+        message = '${l10n.importError}: ${e.toString()}';
         AppLogger.e('Исключение при импорте медиафайла', e, stackTrace);
       }
 
@@ -87,7 +87,7 @@ class HomePage extends HookConsumerWidget {
                 success
                     ? null
                     : SnackBarAction(
-                      label: 'Детали',
+                      label: l10n.errorDetails,
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -124,7 +124,7 @@ class HomePage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Secure Media Vault'),
+        title: Text(l10n.appName),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -140,7 +140,7 @@ class HomePage extends HookConsumerWidget {
       body: _buildBody(context, mediaState, handleItemTap),
       floatingActionButton: FloatingActionButton(
         onPressed: handleAddMedia,
-        tooltip: 'Добавить медиафайл',
+        tooltip: l10n.addMediaTooltip,
         child: const Icon(Icons.add),
       ),
     );
@@ -152,6 +152,8 @@ class HomePage extends HookConsumerWidget {
     MediaState state,
     void Function(MediaFile) onItemTap,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Показываем индикатор загрузки
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -169,11 +171,11 @@ class HomePage extends HookConsumerWidget {
               color: Colors.grey,
             ),
             const SizedBox(height: 16),
-            const Text('Нет защищенных файлов', style: TextStyle(fontSize: 18)),
+            Text(l10n.noProtectedFiles, style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 8),
-            const Text(
-              'Нажмите + чтобы добавить фото или видео',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              l10n.pressToAddMedia,
+              style: const TextStyle(color: Colors.grey),
             ),
           ],
         ),
@@ -223,7 +225,7 @@ class HomePage extends HookConsumerWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        item.duration,
+                        "0:00", // Заглушка для демонстрации
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,

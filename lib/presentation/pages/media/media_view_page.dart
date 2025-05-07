@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Страница просмотра медиафайла
 class MediaViewPage extends HookConsumerWidget {
@@ -16,10 +17,11 @@ class MediaViewPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // В реальном приложении здесь будет использоваться ViewMediaUseCase
     // через провайдер состояния
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isImage ? 'Просмотр изображения' : 'Просмотр видео'),
+        title: Text(isImage ? l10n.imageViewTitle : l10n.videoViewTitle),
         actions: [
           // Кнопка шаринга
           IconButton(
@@ -27,9 +29,9 @@ class MediaViewPage extends HookConsumerWidget {
             onPressed: () {
               // В реальном приложении будет использоваться ShareMediaUseCase
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Функция шаринга будет реализована позже'),
-                  duration: Duration(seconds: 2),
+                SnackBar(
+                  content: Text(l10n.sharingNotImplemented),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
@@ -56,9 +58,7 @@ class MediaViewPage extends HookConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              isImage
-                  ? 'Здесь будет отображаться изображение'
-                  : 'Здесь будет отображаться видео',
+              isImage ? l10n.imagePreview : l10n.videoPreview,
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
@@ -72,16 +72,14 @@ class MediaViewPage extends HookConsumerWidget {
                 onPressed: () {
                   // В реальном приложении здесь будет воспроизведение видео
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Функция воспроизведения будет реализована позже',
-                      ),
-                      duration: Duration(seconds: 2),
+                    SnackBar(
+                      content: Text(l10n.playVideoNotImplemented),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 },
                 icon: const Icon(Icons.play_arrow),
-                label: const Text('Воспроизвести'),
+                label: Text(l10n.playVideo),
               ),
           ],
         ),
@@ -91,18 +89,18 @@ class MediaViewPage extends HookConsumerWidget {
 
   /// Показывает диалог подтверждения удаления
   void _showDeleteConfirmation(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Подтверждение'),
-            content: const Text(
-              'Вы уверены, что хотите удалить этот файл? Это действие нельзя отменить.',
-            ),
+            title: Text(l10n.deleteConfirmTitle),
+            content: Text(l10n.deleteConfirmMessage),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Отмена'),
+                child: Text(l10n.cancel),
               ),
               TextButton(
                 onPressed: () {
@@ -112,15 +110,15 @@ class MediaViewPage extends HookConsumerWidget {
 
                   // Показываем уведомление
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Файл удален'),
-                      duration: Duration(seconds: 2),
+                    SnackBar(
+                      content: Text(l10n.fileDeleted),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 },
-                child: const Text(
-                  'Удалить',
-                  style: TextStyle(color: Colors.red),
+                child: Text(
+                  l10n.delete,
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
             ],

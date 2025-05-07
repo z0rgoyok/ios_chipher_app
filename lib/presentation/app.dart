@@ -39,7 +39,7 @@ class SecureMediaVaultApp extends HookConsumerWidget {
       home:
           isAuthenticated.value
               ? const HomePage()
-              : LoginPage(onLoginSuccess: () => isAuthenticated.value = true),
+              : const LoginPage(),
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ios_chipher_app/core/utils/logger.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Диалог для выбора типа медиафайла при импорте
@@ -15,20 +14,20 @@ class MediaImportDialog extends StatelessWidget {
       content: Text(l10n.mediaImportMessage),
       actions: [
         _buildImportOption(context, l10n.photoOption, Icons.photo, () {
-          AppLogger.i('Выбран импорт фото');
+          debugPrint('Выбран импорт фото');
           Navigator.of(context).pop('photo');
         }),
         _buildImportOption(context, l10n.videoOption, Icons.videocam, () {
-          AppLogger.i('Выбран импорт видео');
+          debugPrint('Выбран импорт видео');
           Navigator.of(context).pop('video');
         }),
         _buildImportOption(context, l10n.anyMediaOption, Icons.perm_media, () {
-          AppLogger.i('Выбран импорт любого медиафайла');
+          debugPrint('Выбран импорт любого медиафайла');
           Navigator.of(context).pop('any');
         }),
         TextButton(
           onPressed: () {
-            AppLogger.i('Импорт отменен пользователем');
+            debugPrint('Импорт отменен пользователем');
             Navigator.of(context).pop();
           },
           child: Text(l10n.cancel),
@@ -61,7 +60,7 @@ class MediaImportDialog extends StatelessWidget {
 /// - 'any' - любой медиафайл
 /// - null - если диалог был закрыт
 Future<String?> showMediaImportDialog(BuildContext context) async {
-  AppLogger.i('Открываем диалог выбора медиафайла');
+  debugPrint('Открываем диалог выбора медиафайла');
   return showDialog<String>(
     context: context,
     builder: (BuildContext context) {
